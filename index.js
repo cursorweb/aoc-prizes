@@ -42,21 +42,22 @@ You can also view the github: [here](https://github.com/cursorweb/aoc-prizes-bot
 \`~test\` send a message`);
     }
 
+    async function input(text) {
+        await msg.reply({ content: text });
+        const filter = m => m.author.id == msg.author.id;
+        return msg.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] })
+            .then(collected => collected.first().content)
+            .catch(() => {
+                msg.reply('Didnt finish.');
+            });
+    }
+
     let cmd = msg.content.toLowerCase().trim();
     if (cmd == "~gen") {
         // good luck!!
-        msg.reply({ content: "What time to <verb>?" })
-            .then(() => {
-                const filter = _ => true;
-                msg.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] })
-                    .then(collected => {
-                        // console.log(collected);
-                        msg.reply(`we have: ${collected.first().content}`);
-                    })
-                    .catch(collected => {
-                        msg.reply('Looks like nobody got the answer this time.');
-                    });
-            });
+        const time = await input("what time to verb?");
+        const amount = await input("how many winners?");
+        msg.channel.send(`got: ${time} time with ${amount} winners`);
     }
 });
 
